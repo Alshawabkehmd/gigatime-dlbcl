@@ -24,7 +24,7 @@ dataset. Anyone using them must:
    209 cases of diffuse large B-cell lymphoma* (DLBCL-Morphology). The Cancer Imaging Archive.
    https://doi.org/10.7937/NVA3-N783 — and the paper: Vrabac D, et al. *DLBCL-Morph*.
    *Scientific Data* 2021.
-2. **Cite this repository** when using the derived GigaTIME features (see `CITATION.cff`).
+2. **Cite this repository** when using the derived GigaTIME features — https://doi.org/10.5281/zenodo.23703857 (see `CITATION.cff`).
 3. **Use non-commercially only.**
 4. **Not attempt to re-identify patients**, alone or by linking with other data
    ([TCIA Data Usage Policy](https://www.cancerimagingarchive.net/data-usage-policies-and-restrictions/)).

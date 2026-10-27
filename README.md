@@ -1,6 +1,7 @@
 # GigaTIME virtual multiplex immunofluorescence in DLBCL
 
 [![tests](https://github.com/Alshawabkehmd/gigatime-dlbcl/actions/workflows/tests.yml/badge.svg)](https://github.com/Alshawabkehmd/gigatime-dlbcl/actions/workflows/tests.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23703857.svg)](https://doi.org/10.5281/zenodo.23703857)
 [![Data: CC BY-NC 4.0](https://img.shields.io/badge/data-CC%20BY--NC%204.0-lightgrey.svg)](data/LICENSE)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Alshawabkehmd/gigatime-dlbcl/blob/main/notebooks/gigatime_dlbcl_pipeline.ipynb)
 
@@ -77,7 +78,7 @@ data/         clinical + GigaTIME feature tables (CC BY-NC 4.0), README, diction
 Single tissue-microarray cohort; virtual stains with no ground-truth mIF; solid-tumor model used without retraining; 21 double-expressor cases; no external validation yet.
 
 ## Citation
-See [`CITATION.cff`](CITATION.cff). Please also cite DLBCL-Morph (Vrabac et al., *Sci Data* 2021) and GigaTIME (*Cell* 2025).
+Cite the archived release: Alshawabkeh AB. *GigaTIME virtual multiplex immunofluorescence in DLBCL: reproducible pipeline and data* (v1.1.0). Zenodo. https://doi.org/10.5281/zenodo.23703857 — see [`CITATION.cff`](CITATION.cff). Please also cite DLBCL-Morph (Vrabac et al., *Sci Data* 2021) and GigaTIME (*Cell* 2025).
 
 ## License
 Code: MIT (see `LICENSE`). Data in `data/`: CC BY-NC 4.0 (see `data/LICENSE`). GigaTIME weights keep their own terms (research use only).
