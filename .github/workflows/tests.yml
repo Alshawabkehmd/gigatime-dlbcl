@@ -23,3 +23,17 @@ jobs:
           NotebookClient(nb, timeout=1800, kernel_name="python3", resources={"metadata": {"path": "notebooks"}}).execute()
           print("notebook OK")
           PY
+      - name: Reproduce the published results from the included data (features mode)
+        run: |
+          python - << 'PY'
+          import nbformat
+          from nbclient import NotebookClient
+          nb = nbformat.read("notebooks/gigatime_dlbcl_pipeline.ipynb", as_version=4)
+          for c in nb.cells:
+              if c.cell_type == "code" and c.source.startswith('MODE = "synthetic"'):
+                  c.source = c.source.replace('MODE = "synthetic"', 'MODE = "features"', 1)
+          NotebookClient(nb, timeout=1800, kernel_name="python3", resources={"metadata": {"path": "notebooks"}}).execute()
+          out = "".join(o.get("text", "") for c in nb.cells if c.cell_type == "code" for o in c.get("outputs", []))
+          assert "ALL KEY RESULTS REPRODUCED" in out, "results differ from results/expected_results.json"
+          print("ALL KEY RESULTS REPRODUCED")
+          PY

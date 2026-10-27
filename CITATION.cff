@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this code, please cite it as below, together with DLBCL-Morph and GigaTIME."
 title: "GigaTIME virtual multiplex immunofluorescence in DLBCL: reproducible pipeline"
-version: 1.0.0
+version: 1.1.0
 date-released: 2026-10-26
 license: MIT
 repository-code: "https://github.com/Alshawabkehmd/gigatime-dlbcl"
@@ -17,6 +17,15 @@ references:
         given-names: Damir
     journal: "Scientific Data"
     year: 2021
+  - type: dataset
+    title: "H&E and immunohistochemical stain images of 209 cases of diffuse large B-cell lymphoma (DLBCL-Morphology)"
+    authors:
+      - family-names: Vrabac
+        given-names: Damir
+    publisher:
+      name: "The Cancer Imaging Archive"
+    doi: 10.7937/NVA3-N783
+    license: CC-BY-NC-4.0
   - type: software
     title: "GigaTIME"
     repository-code: "https://github.com/prov-gigatime/GigaTIME"

@@ -1,0 +1,17 @@
+Data in this folder (clinical_data_cleaned.csv, gigatime_case_features.csv,
+gigatime_case_features_rich.csv) are licensed under the Creative Commons
+Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0):
+https://creativecommons.org/licenses/by-nc/4.0/legalcode
+
+clinical_data_cleaned.csv is redistributed unmodified from DLBCL-Morph:
+  Vrabac D, et al. H&E and immunohistochemical stain images of 209 cases of
+  diffuse large B-cell lymphoma (DLBCL-Morphology). The Cancer Imaging Archive.
+  https://doi.org/10.7937/NVA3-N783  (licensed CC BY-NC 4.0)
+
+gigatime_case_features*.csv are derived from the DLBCL-Morph H&E images using
+GigaTIME (https://github.com/prov-gigatime/GigaTIME) by Almoutasm Bllah
+Alshawabkeh (2026), and are released under the same CC BY-NC 4.0 terms.
+
+Users must credit both sources, use the data non-commercially, and must not
+attempt to identify any research participant. The code in this repository is
+licensed separately (MIT, see ../LICENSE).

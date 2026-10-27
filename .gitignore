@@ -1,5 +1,8 @@
-# ---- never commit patient data or model outputs ----
+# ---- model outputs and local data (the 3 public tables in data/ are whitelisted) ----
 data/*.csv
+!data/clinical_data_cleaned.csv
+!data/gigatime_case_features.csv
+!data/gigatime_case_features_rich.csv
 data/*.xlsx
 *.npy
 gigatime_out/
