@@ -4,7 +4,7 @@ title: "GigaTIME virtual multiplex immunofluorescence in DLBCL: reproducible pip
 version: 1.0.0
 date-released: 2026-10-26
 license: MIT
-repository-code: "https://github.com/almoutasmmd/gigatime-dlbcl"
+repository-code: "https://github.com/Alshawabkehmd/gigatime-dlbcl"
 authors:
   - family-names: Alshawabkeh
     given-names: Almoutasm Bllah

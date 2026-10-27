@@ -1,0 +1,25 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: Unit tests (synthetic data)
+        run: pytest -q
+      - name: Run the notebook end to end (synthetic mode)
+        run: |
+          python - << 'PY'
+          import nbformat
+          from nbclient import NotebookClient
+          nb = nbformat.read("notebooks/gigatime_dlbcl_pipeline.ipynb", as_version=4)
+          for c in nb.cells:
+              if c.cell_type == "code" and c.source.startswith('MODE = "synthetic"'):
+                  c.source = c.source.replace("N_PERMUTATIONS = 1000", "N_PERMUTATIONS = 50").replace("N_BOOTSTRAP = 2000", "N_BOOTSTRAP = 200")
+          NotebookClient(nb, timeout=1800, kernel_name="python3", resources={"metadata": {"path": "notebooks"}}).execute()
+          print("notebook OK")
+          PY

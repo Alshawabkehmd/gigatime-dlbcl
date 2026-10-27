@@ -1,7 +1,7 @@
 # GigaTIME virtual multiplex immunofluorescence in DLBCL
 
-[![tests](https://github.com/almoutasmmd/gigatime-dlbcl/actions/workflows/tests.yml/badge.svg)](https://github.com/almoutasmmd/gigatime-dlbcl/actions/workflows/tests.yml)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/almoutasmmd/gigatime-dlbcl/blob/main/notebooks/gigatime_dlbcl_pipeline.ipynb)
+[![tests](https://github.com/Alshawabkehmd/gigatime-dlbcl/actions/workflows/tests.yml/badge.svg)](https://github.com/Alshawabkehmd/gigatime-dlbcl/actions/workflows/tests.yml)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Alshawabkehmd/gigatime-dlbcl/blob/main/notebooks/gigatime_dlbcl_pipeline.ipynb)
 
 Reproducible code for applying **GigaTIME** — a foundation model that translates routine H&E
 into 21 virtual multiplex-immunofluorescence (mIF) channels — to diffuse large B-cell lymphoma
@@ -27,7 +27,7 @@ runs end to end in ~2 minutes with no data, to show the code works.
 
 **Locally:**
 ```bash
-git clone https://github.com/almoutasmmd/gigatime-dlbcl
+git clone https://github.com/Alshawabkehmd/gigatime-dlbcl
 cd gigatime-dlbcl
 pip install -r requirements.txt
 pytest -q                                   # tests on synthetic data
