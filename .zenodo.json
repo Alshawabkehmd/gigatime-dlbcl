@@ -1,0 +1,18 @@
+{
+  "title": "GigaTIME virtual multiplex immunofluorescence in DLBCL: reproducible pipeline and data",
+  "upload_type": "software",
+  "description": "<p>Reproducible notebook, code and per-patient data for applying GigaTIME (H&amp;E to 21-channel virtual multiplex immunofluorescence) to the DLBCL-Morph cohort (209 cases; 170 analysed). Includes the DLBCL-Morph clinical table and GigaTIME-derived feature tables.</p><p>Code: MIT. Data in <code>data/</code>: CC BY-NC 4.0 &mdash; cite DLBCL-Morph (doi:10.7937/NVA3-N783). Research use only; not for clinical decisions.</p>",
+  "creators": [
+    {
+      "name": "Alshawabkeh, Almoutasm Bllah",
+      "affiliation": "Department of Internal Medicine, University of Central Florida / HCA Florida North Florida Hospital"
+    }
+  ],
+  "license": "cc-by-nc-4.0",
+  "access_right": "open",
+  "keywords": ["DLBCL", "diffuse large B-cell lymphoma", "computational pathology", "virtual multiplex immunofluorescence", "GigaTIME", "DLBCL-Morph", "double-expressor"],
+  "related_identifiers": [
+    {"identifier": "10.7937/NVA3-N783", "relation": "isDerivedFrom", "scheme": "doi"},
+    {"identifier": "https://github.com/prov-gigatime/GigaTIME", "relation": "requires", "scheme": "url"}
+  ]
+}
