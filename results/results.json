@@ -1,0 +1,245 @@
+{
+  "mode": "features",
+  "cohort_flow": {
+    "clinical_rows": 209,
+    "with_gigatime_features": 170,
+    "with_os_and_event": 170,
+    "events_in_feature_cohort": 58,
+    "double_expressor_evaluable_all": 190,
+    "double_expressor_cohort": 160,
+    "double_expressor_positive": 21,
+    "double_expressor_negative": 139
+  },
+  "face_validity": {
+    "channel_means": {
+      "DAPI": 0.7058,
+      "PD-1": 0.6619,
+      "CD14": 0.0944,
+      "CD4": 0.4797,
+      "T-bet": 0.1137,
+      "CD34": 0.0375,
+      "CD68": 0.1817,
+      "CD16": 0.0266,
+      "CD11c": 0.0964,
+      "CD138": 0.4589,
+      "CD20": 0.5332,
+      "CD3": 0.5118,
+      "CD8": 0.1182,
+      "PD-L1": 0.3497,
+      "CK": 0.1831,
+      "Ki67": 0.0436,
+      "Tryptase": 0.0206,
+      "Actin-D": 0.0755,
+      "Caspase3-D": 0.5473,
+      "PHH3-B": 0.2007,
+      "Transgelin": 0.015
+    },
+    "cd20_mean": 0.533,
+    "cd20_range": [
+      0.12,
+      0.831
+    ],
+    "ck_mean": 0.183,
+    "cd3_mean": 0.512,
+    "dapi_mean": 0.706,
+    "cd20_rank_of_21": 4
+  },
+  "coexpression": {
+    "within_t_cell_r": 0.69,
+    "within_myeloid_r": 0.81,
+    "cd3_cd4_r": 0.99,
+    "cd8_pd1_r": 0.57,
+    "cd14_cd11c_r": 0.9,
+    "cd3_ck_r": -0.72,
+    "cd20_ck_r": -0.65,
+    "ki67_phh3_r": 0.56
+  },
+  "coo_classification": {
+    "n": 163,
+    "auc_oof": 0.557
+  },
+  "univariable_cox": {
+    "n_patients": 170,
+    "n_events": 58,
+    "n_features": 84,
+    "n_fdr_significant": 0,
+    "top_feature": "Transgelin_posfrac",
+    "top_p": 0.0478,
+    "top_q": 0.989
+  },
+  "gigatime_signature": {
+    "n": 170,
+    "events": 58,
+    "cindex_mean": 0.43,
+    "cindex_min": 0.397,
+    "cindex_max": 0.459,
+    "per_seed": {
+      "0": 0.459,
+      "7": 0.429,
+      "17": 0.422,
+      "42": 0.444,
+      "123": 0.397
+    }
+  },
+  "clinical_and_ipi": {
+    "ipi_n": 170,
+    "ipi_cindex": 0.649,
+    "clinical_n": 159,
+    "clinical_cindex_oof": 0.663
+  },
+  "added_value": {
+    "n": 159,
+    "clinical_cindex_apparent": 0.709,
+    "lrt_p_median": 0.061,
+    "lrt_p_range": [
+      0.003,
+      0.175
+    ],
+    "gigatime_hr_all_below_1": true,
+    "per_seed": {
+      "0": {
+        "lrt_p": 0.175,
+        "gigatime_hr": 0.2,
+        "cindex_apparent": 0.713
+      },
+      "7": {
+        "lrt_p": 0.046,
+        "gigatime_hr": 0.2,
+        "cindex_apparent": 0.722
+      },
+      "17": {
+        "lrt_p": 0.003,
+        "gigatime_hr": 0.09,
+        "cindex_apparent": 0.731
+      },
+      "42": {
+        "lrt_p": 0.114,
+        "gigatime_hr": 0.22,
+        "cindex_apparent": 0.721
+      },
+      "123": {
+        "lrt_p": 0.061,
+        "gigatime_hr": 0.18,
+        "cindex_apparent": 0.733
+      }
+    }
+  },
+  "km": {
+    "ipi_logrank_p": 0.000626,
+    "gigatime_split_logrank_p": 0.113,
+    "gigatime_high_risk_death_rate": 0.28,
+    "gigatime_low_risk_death_rate": 0.4
+  },
+  "double_expressor": {
+    "n": 160,
+    "n_del": 21,
+    "n_non_del": 139,
+    "n_fdr_significant_coo_adjusted": 12,
+    "significant_channels": [
+      "DAPI",
+      "CD4",
+      "T-bet",
+      "CD68",
+      "CD11c",
+      "CD138",
+      "CD20",
+      "CD3",
+      "PD-L1",
+      "CK",
+      "Ki67",
+      "Caspase3-D"
+    ],
+    "global_signal_del": 0.228,
+    "global_signal_non_del": 0.267,
+    "global_signal_p": 0.00071,
+    "classifier_auc_oof": 0.614
+  },
+  "double_expressor_robustness": {
+    "observed_significant": 12,
+    "permutation_n": 1000,
+    "permutation_null_median": 0.0,
+    "permutation_null_95th": 0.0,
+    "permutation_p": 0.001,
+    "bootstrap_ci_x100": {
+      "CD3": [
+        -3.1,
+        -1.74,
+        -0.41
+      ],
+      "CD4": [
+        -3.41,
+        -2.0,
+        -0.57
+      ],
+      "PD-L1": [
+        -1.75,
+        -1.06,
+        -0.32
+      ],
+      "CD68": [
+        -1.13,
+        -0.67,
+        -0.17
+      ],
+      "T-bet": [
+        -0.72,
+        -0.49,
+        -0.24
+      ],
+      "Ki67": [
+        0.03,
+        0.21,
+        0.38
+      ],
+      "CD138": [
+        0.61,
+        2.03,
+        3.26
+      ],
+      "Caspase3-D": [
+        1.18,
+        2.48,
+        3.86
+      ],
+      "DAPI": [
+        1.13,
+        2.29,
+        3.45
+      ]
+    },
+    "leave_one_out_min": 12,
+    "leave_one_out_max": 15,
+    "thresholds": [
+      {
+        "myc": 30,
+        "bcl2": 50,
+        "n_del": 31,
+        "n_significant": 15
+      },
+      {
+        "myc": 40,
+        "bcl2": 40,
+        "n_del": 21,
+        "n_significant": 12
+      },
+      {
+        "myc": 40,
+        "bcl2": 50,
+        "n_del": 21,
+        "n_significant": 12
+      },
+      {
+        "myc": 40,
+        "bcl2": 60,
+        "n_del": 21,
+        "n_significant": 12
+      },
+      {
+        "myc": 50,
+        "bcl2": 50,
+        "n_del": 20,
+        "n_significant": 14
+      }
+    ]
+  }
+}

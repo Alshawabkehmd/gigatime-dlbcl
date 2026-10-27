@@ -1,0 +1,14 @@
+{
+  "gtdlbcl": "1.0.0",
+  "python": "3.13.17",
+  "mode": "features",
+  "seed": 17,
+  "gigatime_commit": "acc49b2567fd15ce95b5a82caaab5f0a295b88f7",
+  "numpy": "2.5.3",
+  "pandas": "2.3.3",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "statsmodels": "0.15.0",
+  "lifelines": "0.30.3",
+  "matplotlib": "3.11.2"
+}

@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below, together with DLBCL-Morph and GigaTIME."
+title: "GigaTIME virtual multiplex immunofluorescence in DLBCL: reproducible pipeline"
+version: 1.0.0
+date-released: 2026-10-26
+license: MIT
+repository-code: "https://github.com/almoutasmmd/gigatime-dlbcl"
+authors:
+  - family-names: Alshawabkeh
+    given-names: Almoutasm Bllah
+    affiliation: "Department of Internal Medicine, University of Central Florida / HCA Florida North Florida Hospital"
+references:
+  - type: article
+    title: "DLBCL-Morph: Morphological features computed using deep learning for an annotated digital DLBCL image set"
+    authors:
+      - family-names: Vrabac
+        given-names: Damir
+    journal: "Scientific Data"
+    year: 2021
+  - type: software
+    title: "GigaTIME"
+    repository-code: "https://github.com/prov-gigatime/GigaTIME"
