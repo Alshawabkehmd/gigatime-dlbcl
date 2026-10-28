@@ -19,7 +19,7 @@ jobs:
           nb = nbformat.read("notebooks/gigatime_dlbcl_pipeline.ipynb", as_version=4)
           for c in nb.cells:
               if c.cell_type == "code" and c.source.startswith('MODE = "synthetic"'):
-                  c.source = c.source.replace("N_PERMUTATIONS = 1000", "N_PERMUTATIONS = 50").replace("N_BOOTSTRAP = 2000", "N_BOOTSTRAP = 200")
+                  c.source = c.source.replace("N_PERMUTATIONS = 1000", "N_PERMUTATIONS = 50").replace("N_BOOTSTRAP = 2000", "N_BOOTSTRAP = 200").replace("N_SURVIVAL_PERMUTATIONS = 300", "N_SURVIVAL_PERMUTATIONS = 3")
           NotebookClient(nb, timeout=1800, kernel_name="python3", resources={"metadata": {"path": "notebooks"}}).execute()
           print("notebook OK")
           PY
@@ -31,7 +31,7 @@ jobs:
           nb = nbformat.read("notebooks/gigatime_dlbcl_pipeline.ipynb", as_version=4)
           for c in nb.cells:
               if c.cell_type == "code" and c.source.startswith('MODE = "synthetic"'):
-                  c.source = c.source.replace('MODE = "synthetic"', 'MODE = "features"', 1)
+                  c.source = c.source.replace('MODE = "synthetic"', 'MODE = "features"', 1).replace("N_SURVIVAL_PERMUTATIONS = 300", "N_SURVIVAL_PERMUTATIONS = 0")  # 300-shuffle null: run locally (~15 min)
           NotebookClient(nb, timeout=1800, kernel_name="python3", resources={"metadata": {"path": "notebooks"}}).execute()
           out = "".join(o.get("text", "") for c in nb.cells if c.cell_type == "code" for o in c.get("outputs", []))
           assert "ALL KEY RESULTS REPRODUCED" in out, "results differ from results/expected_results.json"

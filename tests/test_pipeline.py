@@ -56,6 +56,26 @@ def test_no_false_survival_signal(synth):
     assert stats.clinical_and_ipi(feat, clin)["ipi_cindex"] > 0.6
 
 
+def test_audit_analyses_run(synth):
+    """Cohort table, compositional-axis checks and survival null run and return sane values."""
+    clin, feat = synth
+    coh = stats.double_expressor_cohort(feat, clin)
+    assert coh["double_expressor"]["n"] + coh["other"]["n"] == stats.double_expressor(feat, clin)[1]["n"]
+    ax = stats.double_expressor_axis(feat, clin, n_perm=20)
+    assert ax["n_significant_clr_bh"] >= 3           # planted shift is found on the log-ratio scale too
+    assert len(ax["n_significant_after_adjusting_each_channel"]) == 21
+    sn = stats.survival_null(feat, clin, n_perm=3)
+    assert 0 <= sn["p_two_sided"] <= 1 and sn["detectable_hr_per_sd_80pct_power"] > 1
+
+
+def test_stratified_permutation_keeps_strata():
+    rng = np.random.default_rng(0)
+    y = np.array([1, 0, 0, 1, 0, 1, 0, 0])
+    g = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+    yy = stats._strat_perm(y, g, rng)
+    assert yy[g == 0].sum() == y[g == 0].sum() and yy[g == 1].sum() == y[g == 1].sum()
+
+
 def test_deterministic(synth):
     clin, feat = synth
     a = stats.gigatime_signature(feat, clin, seeds=(17,))
@@ -92,10 +112,14 @@ def test_reproduces_published_values():
         "coexpression": stats.coexpression(feat)[1],
         "face_validity": stats.face_validity(feat),
         "double_expressor": stats.double_expressor(feat, clin)[1],
+        "double_expressor_cohort": stats.double_expressor_cohort(feat, clin),
+        "double_expressor_axis": stats.double_expressor_axis(feat, clin, n_perm=50),
     }
+    # values that depend on the number of permutations are checked in the notebook only
+    skip = {"double_expressor_axis.pc1_stratified_permutation_p"}
     for key, spec in exp.items():
         top = key.split(".")[0]
-        if top not in res:
+        if top not in res or key in skip:
             continue
         d = res
         for k in key.split("."):

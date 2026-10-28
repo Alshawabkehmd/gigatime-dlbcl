@@ -165,11 +165,11 @@ def double_expressor_bars(table, summary, out_dir, synthetic=False):
     ax.set_yticklabels(table["channel"], fontsize=9)
     ax.grid(axis="y", visible=False)
     ax.set_xlabel("Change in share of total virtual signal (x100), double-expressor minus other")
-    ax.set_title(f"Double-expressor tumors are immune-cold (n={summary['n_del']} vs {summary['n_non_del']})")
+    ax.set_title(f"Virtual composition shift in double-expressor tumors (n={summary['n_del']} vs {summary['n_non_del']})")
     ax.legend(handles=[Patch(color=BLUE, label="Immune"), Patch(color=ORANGE, label="Tumor / proliferation"),
                        Patch(color=GREY, label="Other")], loc="lower right")
     fig.text(0.01, -0.02, "* FDR q<0.05, ** q<0.01, *** q<0.001 (logistic regression adjusted for cell-of-origin). "
-             "CK has no lymphoid correlate and is not interpreted.", fontsize=8, color=INK2)
+             "Shares sum to 1, so shifts are not independent; they form one axis (see fig_double_expressor_axis).", fontsize=8, color=INK2)
     fig.tight_layout()
     return _save(fig, out_dir, "fig_double_expressor.png", synthetic)
 
@@ -180,8 +180,8 @@ def robustness_panel(rob, out_dir, synthetic=False):
     perm = np.array(rob["_perm_distribution"])
     a.hist(perm, bins=np.arange(-0.5, max(perm.max(), rob["observed_significant"]) + 1.5), color=GREY)
     a.axvline(rob["observed_significant"], color=ORANGE, lw=2.5)
-    a.set_title(f"A. Permutation null (p = {rob['permutation_p']:.3f})")
-    a.set_xlabel("Significant channels with shuffled labels")
+    a.set_title(f"A. Permutation null, {rob['permutation_n']} shuffles (p = {rob['permutation_p']:.3f})")
+    a.set_xlabel("Significant channels, labels shuffled within cell-of-origin")
     a.set_ylabel("Count")
     b = ax[0, 1]
     ci = rob["bootstrap_ci_x100"]
@@ -208,7 +208,8 @@ def robustness_panel(rob, out_dir, synthetic=False):
     labs = [f"MYC>={t['myc']}\nBCL2>={t['bcl2']}" for t in th]
     d.bar(range(len(th)), [t["n_significant"] for t in th], color=BLUE, width=0.6)
     for i, t in enumerate(th):
-        d.text(i, t["n_significant"] + 0.2, f"{t['n_significant']}\n(n={t['n_del']})", ha="center", fontsize=8)
+        tag = "same 21" if t.get("same_patients_as_primary") else f"n={t['n_del']}"
+        d.text(i, t["n_significant"] + 0.2, f"{t['n_significant']}\n({tag})", ha="center", fontsize=8)
     d.set_xticks(range(len(th)))
     d.set_xticklabels(labs, fontsize=8)
     d.set_title("D. Threshold sensitivity")
@@ -217,6 +218,56 @@ def robustness_panel(rob, out_dir, synthetic=False):
     fig.suptitle("Internal robustness of the double-expressor signature", fontweight="bold", x=0.01, ha="left")
     fig.tight_layout()
     return _save(fig, out_dir, "fig_robustness.png", synthetic)
+
+
+def double_expressor_axis(axis, out_dir, synthetic=False):
+    """A: PC1 by group. B: PC1 vs MYC IHC. C: significant channels after adjusting for each channel."""
+    fig, ax = plt.subplots(1, 3, figsize=(15, 4.8), gridspec_kw={"width_ratios": [0.8, 1.1, 1.4]})
+    pc1, y, myc = np.array(axis["_pc1_scores"]), np.array(axis["_y"]), np.array(axis["_myc"])
+    rng = np.random.default_rng(0)
+    a = ax[0]
+    for g, col, lab in [(0, GREY, "Other"), (1, ORANGE, "Double-expressor")]:
+        v = pc1[y == g]
+        a.scatter(g + rng.uniform(-0.15, 0.15, len(v)), v, s=14, color=col, alpha=0.7, zorder=3)
+        a.plot([g - 0.25, g + 0.25], [np.median(v)] * 2, color=INK, lw=2, zorder=4)
+    a.set_xticks([0, 1]); a.set_xticklabels([f"Other\n(n={(y == 0).sum()})", f"Double-expressor\n(n={(y == 1).sum()})"])
+    a.set_ylabel("PC1 score (centered log-ratio)")
+    a.set_title(f"A. One axis (PC1 p = {axis['pc1_coo_adjusted_p']:.1g})")
+    b = ax[1]
+    b.scatter(myc[y == 0] + rng.uniform(-1.5, 1.5, (y == 0).sum()), pc1[y == 0], s=14, color=GREY, alpha=0.7, label="Other")
+    b.scatter(myc[y == 1] + rng.uniform(-1.5, 1.5, (y == 1).sum()), pc1[y == 1], s=18, color=ORANGE, alpha=0.85, label="Double-expressor")
+    b.set_xlabel("MYC IHC (%)"); b.set_ylabel("PC1 score")
+    b.set_title(f"B. Tracks MYC (p = {axis['pc1_vs_myc_continuous_p']:.0e}) > BCL2 (p = {axis['pc1_vs_bcl2_continuous_p']:.2f})")
+    b.legend(loc="upper left", fontsize=9)
+    c = ax[2]
+    adj = axis["n_significant_after_adjusting_each_channel"]
+    names = sorted(adj, key=lambda k: adj[k])
+    c.barh(range(len(names)), [adj[k] for k in names], color=[ORANGE if adj[k] == 0 else BLUE for k in names], height=0.7, zorder=3)
+    c.set_yticks(range(len(names))); c.set_yticklabels(names, fontsize=8)
+    c.grid(axis="y", visible=False)
+    c.set_xlabel("Significant channels after adjusting for this one")
+    c.set_title("C. Adjusting for one axis channel removes all")
+    fig.suptitle("The double-expressor shift is one MYC-associated axis, not many independent channels",
+                 fontweight="bold", x=0.01, ha="left")
+    fig.tight_layout()
+    return _save(fig, out_dir, "fig_double_expressor_axis.png", synthetic)
+
+
+def survival_null(sn, out_dir, synthetic=False):
+    """Null distribution of the out-of-fold C-index after shuffling outcomes."""
+    fig, ax = plt.subplots(figsize=(7.5, 4.2))
+    null = np.array(sn["_null"])
+    ax.hist(null, bins=25, color=GREY, zorder=3)
+    ax.axvline(0.5, color=INK2, lw=1, ls="--")
+    ax.axvline(sn["observed_cindex_pooled"], color=ORANGE, lw=2.5)
+    ax.text(sn["observed_cindex_pooled"], ax.get_ylim()[1] * 0.92, f" observed {sn['observed_cindex_pooled']:.2f}",
+            color=ORANGE, ha="left", fontsize=9)
+    ax.set_xlabel("Out-of-fold C-index with shuffled survival outcomes")
+    ax.set_ylabel("Permutations")
+    lo, hi = sn["null_95_range"]
+    ax.set_title(f"C-index below 0.5 is within chance (null 95%: {lo:.2f}-{hi:.2f}; p = {sn['p_two_sided']:.2f})")
+    fig.tight_layout()
+    return _save(fig, out_dir, "fig_survival_null.png", synthetic)
 
 
 def mif_showcase(he, vir, out_dir):

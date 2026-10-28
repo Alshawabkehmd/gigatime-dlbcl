@@ -53,4 +53,6 @@ CLINICAL_COVARIATES = ["age", "stage", "ldh", "ecog", "coo"]
 # Robustness-test sizes (the notebook can lower these for a quick run).
 N_PERMUTATIONS = 1000
 N_BOOTSTRAP = 2000
+# Full-pipeline outcome permutations for the survival-signature null (slow: ~3 s each).
+N_SURVIVAL_PERMUTATIONS = 300
 THRESHOLD_GRID = [(30, 50), (40, 40), (40, 50), (40, 60), (50, 50)]
