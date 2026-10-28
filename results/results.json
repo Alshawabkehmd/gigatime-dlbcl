@@ -139,19 +139,88 @@
     "gigatime_high_risk_death_rate": 0.28,
     "gigatime_low_risk_death_rate": 0.4
   },
-  "survival_null": {
-    "n_permutations": 300,
-    "observed_cindex_pooled": 0.422,
-    "observed_cindex_per_fold_mean": 0.431,
-    "null_median": 0.491,
-    "null_95_range": [
-      0.387,
-      0.585
+  "matched_survival": {
+    "n": 158,
+    "events": 52,
+    "cindex_mean_over_splits": {
+      "clinical": 0.687,
+      "clinical_en": 0.677,
+      "gigatime": 0.419,
+      "combined": 0.696,
+      "ipi": 0.644
+    },
+    "delta_c_combined_minus_clinical_range": [
+      -0.003,
+      0.025
     ],
-    "null_fraction_below_0_5": 0.55,
-    "p_two_sided": 0.15,
-    "events": 58,
-    "detectable_hr_per_sd_80pct_power": 1.44
+    "delta_c_mean": 0.008,
+    "delta_c_bootstrap_95ci": [
+      0.001,
+      0.016
+    ],
+    "per_seed": {
+      "0": {
+        "clinical": 0.691,
+        "clinical_en": 0.682,
+        "gigatime": 0.471,
+        "combined": 0.703,
+        "ipi": 0.644
+      },
+      "7": {
+        "clinical": 0.688,
+        "clinical_en": 0.678,
+        "gigatime": 0.422,
+        "combined": 0.697,
+        "ipi": 0.644
+      },
+      "17": {
+        "clinical": 0.68,
+        "clinical_en": 0.67,
+        "gigatime": 0.374,
+        "combined": 0.705,
+        "ipi": 0.644
+      },
+      "42": {
+        "clinical": 0.674,
+        "clinical_en": 0.666,
+        "gigatime": 0.449,
+        "combined": 0.672,
+        "ipi": 0.644
+      },
+      "123": {
+        "clinical": 0.704,
+        "clinical_en": 0.691,
+        "gigatime": 0.379,
+        "combined": 0.701,
+        "ipi": 0.644
+      }
+    }
+  },
+  "follow_up": {
+    "median_follow_up_reverse_km_years": 8.8,
+    "km_median_os_years": 12.1,
+    "median_observed_time_years": 7.6,
+    "ph_test_p": {
+      "age": 0.000382,
+      "stage": 0.0336,
+      "ldh": 0.569,
+      "ecog": 0.051,
+      "coo": 0.649
+    },
+    "os_time_origin": "end of treatment (Vrabac et al., 2021)"
+  },
+  "cohort_selection": {
+    "included": 170,
+    "excluded": 39,
+    "ipi_mean_included": 1.83,
+    "ipi_mean_excluded": 2.51,
+    "ipi_mannwhitney_p": 0.00641,
+    "age_median_included": 63.0,
+    "age_median_excluded": 63.0,
+    "deaths_pct_included": 34.1,
+    "deaths_pct_excluded": 35.9,
+    "ipi_reconstruction_complete_records": 203,
+    "ipi_reconstruction_mismatches": 11
   },
   "double_expressor": {
     "n": 160,
@@ -175,7 +244,10 @@
     "global_signal_del": 0.228,
     "global_signal_non_del": 0.267,
     "global_signal_p": 0.00071,
-    "classifier_auc_oof": 0.614
+    "classifier_auc_oof": 0.614,
+    "classifier_features": "all 84 raw feature columns",
+    "classifier_auc_oof_composition_only": 0.708,
+    "n_failed_logistic_fits": 0
   },
   "double_expressor_cohort": {
     "double_expressor": {
@@ -368,5 +440,79 @@
     ],
     "non_gcb_only_n_significant": 13,
     "excluding_double_hit_n_significant": 13
+  },
+  "double_expressor_firth": {
+    "n_significant_firth": 12,
+    "significant_channels_firth": [
+      "DAPI",
+      "CD4",
+      "T-bet",
+      "CD68",
+      "CD11c",
+      "CD138",
+      "CD20",
+      "CD3",
+      "PD-L1",
+      "CK",
+      "Ki67",
+      "Caspase3-D"
+    ],
+    "or_per_sd_key": {
+      "CK": [
+        2.05,
+        1.36,
+        3.08
+      ],
+      "CD3": [
+        0.49,
+        0.31,
+        0.77
+      ],
+      "CD20": [
+        0.52,
+        0.32,
+        0.85
+      ],
+      "CD138": [
+        2.33,
+        1.43,
+        3.79
+      ],
+      "DAPI": [
+        2.53,
+        1.55,
+        4.13
+      ],
+      "Ki67": [
+        1.82,
+        1.21,
+        2.74
+      ]
+    },
+    "n_gcb_double_expressors": 5
+  },
+  "fit_failures": [],
+  "survival_null": {
+    "n_permutations": 300,
+    "observed_cindex_pooled": 0.422,
+    "observed_cindex_per_fold_mean": 0.431,
+    "null_median": 0.491,
+    "null_95_range": [
+      0.387,
+      0.585
+    ],
+    "null_fraction_below_0_5": 0.55,
+    "p_two_sided": 0.15,
+    "events": 58,
+    "detectable_hr_per_sd_80pct_power": 1.44
+  },
+  "added_value_null": {
+    "n_permutations": 100,
+    "observed_delta_c_mean": 0.008,
+    "null_95_range": [
+      -0.015,
+      0.011
+    ],
+    "p_one_sided": 0.069
   }
 }

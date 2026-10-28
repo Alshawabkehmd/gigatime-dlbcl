@@ -184,6 +184,10 @@
     "double_expressor.n_failed_logistic_fits": {
       "value": 0,
       "tolerance": 0
+    },
+    "added_value_null.p_one_sided": {
+      "value": 0.069,
+      "tolerance": 0.03
     }
   }
 }
