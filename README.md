@@ -56,7 +56,7 @@ Images (needed only to re-run GigaTIME) come from DLBCL-Morph directly.
 - **Fixed settings** in [`gtdlbcl/config.py`](gtdlbcl/config.py): seed 17, 5-fold CV, elastic-net Cox (penalty 0.1, L1 ratio 0.5), BH-FDR 0.05, 1,000 permutations, 2,000 bootstraps.
 - **Pinned model code:** GigaTIME at commit `acc49b2`.
 - **Pinned packages:** [`requirements.txt`](requirements.txt); each run writes `outputs/environment.json`.
-- **Verification:** notebook Section 9.1 prints MATCH/DIFF for 32 key results, and GitHub Actions re-runs the real analysis on every push and fails if any result changes.
+- **Verification:** notebook Section 9.1 prints MATCH/DIFF for the key results in [`results/expected_results.json`](results/expected_results.json). GitHub Actions re-runs the real analysis on every push and fails on any difference — except the two slow permutation nulls (Sections 7.7 and 7.8), which are checked only when the notebook is run with the published settings.
 - **Tests:** [`tests/`](tests/) check the schema, the double-expressor definition, determinism, recovery of a planted signal, and absence of a false survival signal on synthetic data. They run on every push (GitHub Actions).
 - **Inference detail that matters:** patches are processed at native size (224 px). Upscaling to 512 px makes virtual CD20 vanish and cytokeratin appear.
 
@@ -79,7 +79,7 @@ data/         clinical + GigaTIME feature tables (CC BY-NC 4.0), README, diction
 Single tissue-microarray cohort; virtual stains with no ground-truth mIF; solid-tumor model used without retraining; 21 double-expressor cases; no external validation yet.
 
 ## Citation
-Cite the archived release: Alshawabkeh AB. *GigaTIME virtual multiplex immunofluorescence in DLBCL: reproducible pipeline and data* (v1.1.0). Zenodo. https://doi.org/10.5281/zenodo.23703857 — see [`CITATION.cff`](CITATION.cff). Please also cite DLBCL-Morph (Vrabac et al., *Sci Data* 2021) and GigaTIME (*Cell* 2025).
+Cite the archived release: Alshawabkeh AB. *GigaTIME virtual multiplex immunofluorescence in DLBCL: reproducible pipeline and data* (v1.1.0). Zenodo. https://doi.org/10.5281/zenodo.23703857 — see [`CITATION.cff`](CITATION.cff). Please also cite the DLBCL-Morph dataset (Fernandez-Pol S, et al., The Cancer Imaging Archive 2022, [doi:10.7937/NVA3-N783](https://doi.org/10.7937/NVA3-N783)), its paper (Vrabac D, et al., *Sci Data* 2021;8:135) and GigaTIME (Valanarasu JMJ, et al., *Cell* 2025).
 
 ## License
-Code: MIT (see `LICENSE`). Data in `data/`: CC BY-NC 4.0 (see `data/LICENSE`). GigaTIME weights keep their own terms (research use only).
+Code: MIT (see `LICENSE`). Data in `data/`: CC BY-NC 4.0 (see `data/LICENSE`). GigaTIME weights are not redistributed; they keep the terms on their Hugging Face model card at the time of download (Apache-2.0 with research-use-only limitations when this study ran). `full` mode records the exact checkpoint used (`outputs/model_provenance.json`).

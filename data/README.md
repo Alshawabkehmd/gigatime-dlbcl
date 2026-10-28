@@ -5,7 +5,7 @@ re-run or extend the analysis without requesting access.
 
 | File | What it is | Rows × columns | Origin |
 |---|---|---|---|
-| `clinical_data_cleaned.csv` | Clinical, immunohistochemistry, FISH and outcome data | 209 × 21 | **Unmodified** DLBCL-Morph file |
+| `clinical_data_cleaned.csv` | Clinical, immunohistochemistry, FISH and outcome data | 209 × 21 | **Unmodified** DLBCL-Morph file (`HANS`: 1 = GCB; `OS` in years **from the end of treatment**) |
 | `gigatime_case_features_rich.csv` | GigaTIME virtual-mIF features per patient (mean, std, 90th percentile, positive fraction × 21 channels) | 170 × 85 | **Derived** in this study |
 | `gigatime_case_features.csv` | Same, primary set only (mean, positive fraction × 21 channels) | 170 × 43 | **Derived** in this study |
 
@@ -20,10 +20,9 @@ SHA-256 checksums, to confirm a copy is unaltered:
 These files are shared under **CC BY-NC 4.0** (see `LICENSE`), the license of the source
 dataset. Anyone using them must:
 
-1. **Cite the source dataset** — Vrabac D, et al. *H&E and immunohistochemical stain images of
-   209 cases of diffuse large B-cell lymphoma* (DLBCL-Morphology). The Cancer Imaging Archive.
-   https://doi.org/10.7937/NVA3-N783 — and the paper: Vrabac D, et al. *DLBCL-Morph*.
-   *Scientific Data* 2021.
+1. **Cite the source dataset** (TCIA's required data citation) — Fernandez-Pol S, Natkunam Y, Vrabac D, Rojansky R, Advani R, Rajpurkar P, et al. H&E and immunohistochemical stain images of 209 cases of diffuse large B-cell lymphoma linked with cytogenetic features and clinical outcomes (Version 1) [Data set]. The Cancer Imaging Archive; 2022. https://doi.org/10.7937/NVA3-N783 — **and** the paper:
+   Vrabac D, Smit A, Rojansky R, et al. DLBCL-Morph: morphological features computed using deep learning
+   for an annotated digital DLBCL image set. *Scientific Data* 2021;8:135.
 2. **Cite this repository** when using the derived GigaTIME features — https://doi.org/10.5281/zenodo.23703857 (see `CITATION.cff`).
 3. **Use non-commercially only.**
 4. **Not attempt to re-identify patients**, alone or by linking with other data
@@ -32,6 +31,14 @@ dataset. Anyone using them must:
 The data are de-identified: `patient_id` is a study code, and no ages are above 89.
 The GigaTIME features are **virtual** (model-predicted) stains, not measured immunofluorescence,
 and are for research use only — not for clinical decisions.
+
+## Notes on the source data
+- `OS` is measured **from the end of treatment** to death or last follow-up (Vrabac et al., 2021), in patients
+  treated with curative-intent R-CHOP or R-CHOP-like therapy — patients had to complete treatment to enter
+  the survival clock. `Follow-up Status` 1 = death. Do not use it as a PFS event indicator.
+- `IPI Score` differs from a reconstruction from its components (age > 60, stage III–IV, elevated LDH,
+  ECOG ≥ 2, > 1 extranodal site) in 11 of 203 complete records; values are left as distributed.
+- Physical resolution (µm per pixel) was not distributed with the patches.
 
 ## Not included (get from DLBCL-Morph)
 - H&E and IHC images and patches (needed only for `full` mode — re-running GigaTIME).

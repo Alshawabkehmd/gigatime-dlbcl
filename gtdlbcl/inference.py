@@ -21,21 +21,41 @@ def install_gigatime(dest="/content/GigaTIME"):
     if not os.path.isdir(os.path.join(dest, "scripts")):
         subprocess.run(["git", "clone", "-q", config.GIGATIME_REPO, dest], check=True)
         subprocess.run(["git", "-C", dest, "checkout", "-q", config.GIGATIME_COMMIT], check=True)
+    # an existing installation must be at the pinned commit
+    head = subprocess.run(["git", "-C", dest, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+    if head != config.GIGATIME_COMMIT:
+        raise RuntimeError(f"GigaTIME at {dest} is at {head}, expected {config.GIGATIME_COMMIT}; "
+                           f"run: git -C {dest} checkout {config.GIGATIME_COMMIT}")
     scripts = os.path.join(dest, "scripts")
     if scripts not in sys.path:
         sys.path.insert(0, scripts)
     return scripts
 
 
-def load_model(device):
-    """Download the gated weights (needs a Hugging Face login) and load GigaTIME."""
+def load_model(device, provenance_path="outputs/model_provenance.json"):
+    """Download the gated weights (needs a Hugging Face login) and load GigaTIME.
+
+    The weights revision is pinned by config.GIGATIME_HF_REVISION when set. Either way,
+    the resolved Hugging Face commit and the SHA-256 of model.pth are written to
+    `provenance_path`, so a run records exactly which checkpoint it used.
+    """
+    import hashlib
+    import json
     import torch
     import archs
     from huggingface_hub import snapshot_download
 
-    local = snapshot_download(repo_id=config.GIGATIME_HF_REPO)
+    local = snapshot_download(repo_id=config.GIGATIME_HF_REPO, revision=config.GIGATIME_HF_REVISION)
+    weights = os.path.join(local, "model.pth")
+    sha = hashlib.sha256(open(weights, "rb").read()).hexdigest()
+    if config.GIGATIME_WEIGHTS_SHA256 and sha != config.GIGATIME_WEIGHTS_SHA256:
+        raise RuntimeError(f"model.pth SHA-256 {sha} does not match config.GIGATIME_WEIGHTS_SHA256")
+    os.makedirs(os.path.dirname(provenance_path) or ".", exist_ok=True)
+    json.dump({"hf_repo": config.GIGATIME_HF_REPO, "hf_snapshot": os.path.basename(local),
+               "requested_revision": config.GIGATIME_HF_REVISION, "model_pth_sha256": sha,
+               "code_commit": config.GIGATIME_COMMIT}, open(provenance_path, "w"), indent=2)
     model = archs.gigatime(num_classes=23, input_channels=3).to(device)
-    state = torch.load(os.path.join(local, "model.pth"), map_location=device)
+    state = torch.load(weights, map_location=device)
     if isinstance(state, dict) and "state_dict" in state:
         state = state["state_dict"]
     model.load_state_dict(state)

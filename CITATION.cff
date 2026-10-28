@@ -18,11 +18,21 @@ references:
         given-names: Damir
     journal: "Scientific Data"
     year: 2021
+    volume: 8
+    start: 135
+    doi: 10.1038/s41597-021-00915-w
   - type: dataset
-    title: "H&E and immunohistochemical stain images of 209 cases of diffuse large B-cell lymphoma (DLBCL-Morphology)"
+    title: "H&E and immunohistochemical stain images of 209 cases of diffuse large B-cell lymphoma linked with cytogenetic features and clinical outcomes"
+    version: "1"
+    year: 2022
     authors:
+      - family-names: Fernandez-Pol
+        given-names: Sebastian
+      - family-names: Natkunam
+        given-names: Yasodha
       - family-names: Vrabac
         given-names: Damir
+      - name: "et al."
     publisher:
       name: "The Cancer Imaging Archive"
     doi: 10.7937/NVA3-N783

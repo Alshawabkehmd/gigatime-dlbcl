@@ -1,5 +1,5 @@
 {
-  "description": "Key results from the real DLBCL-Morph run (MODE='features'). Notebook Section 9.1 and `pytest -m real` compare a re-run against these. Tolerances allow for small numerical differences across package versions. Checks under survival_null are skipped unless N_SURVIVAL_PERMUTATIONS = 300.",
+  "description": "Key results from the real DLBCL-Morph run (MODE='features'). Notebook Section 9.1 and `pytest -m real` compare a re-run against these. Tolerances allow for small numerical differences across package versions. Checks under survival_null / added_value_null are skipped unless those permutation settings are left at their published values.",
   "checks": {
     "cohort_flow.with_gigatime_features": {
       "value": 170,
@@ -127,6 +127,62 @@
     },
     "double_expressor_axis.excluding_double_hit_n_significant": {
       "value": 13,
+      "tolerance": 0
+    },
+    "km.gigatime_split_logrank_p": {
+      "value": 0.113,
+      "tolerance": 0.005
+    },
+    "km.ipi_logrank_p": {
+      "value": 0.000626,
+      "tolerance": 0.0001
+    },
+    "added_value.lrt_p_median": {
+      "value": 0.061,
+      "tolerance": 0.005
+    },
+    "matched_survival.n": {
+      "value": 158,
+      "tolerance": 0
+    },
+    "matched_survival.cindex_mean_over_splits.clinical": {
+      "value": 0.687,
+      "tolerance": 0.005
+    },
+    "matched_survival.cindex_mean_over_splits.ipi": {
+      "value": 0.644,
+      "tolerance": 0.002
+    },
+    "matched_survival.cindex_mean_over_splits.combined": {
+      "value": 0.696,
+      "tolerance": 0.005
+    },
+    "matched_survival.delta_c_mean": {
+      "value": 0.008,
+      "tolerance": 0.003
+    },
+    "follow_up.median_follow_up_reverse_km_years": {
+      "value": 8.8,
+      "tolerance": 0.05
+    },
+    "follow_up.km_median_os_years": {
+      "value": 12.1,
+      "tolerance": 0.05
+    },
+    "cohort_selection.excluded": {
+      "value": 39,
+      "tolerance": 0
+    },
+    "cohort_selection.ipi_reconstruction_mismatches": {
+      "value": 11,
+      "tolerance": 0
+    },
+    "double_expressor_firth.n_significant_firth": {
+      "value": 12,
+      "tolerance": 0
+    },
+    "double_expressor.n_failed_logistic_fits": {
+      "value": 0,
       "tolerance": 0
     }
   }

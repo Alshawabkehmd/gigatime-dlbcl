@@ -228,14 +228,18 @@ def _del_frame(feat, clin, myc=None, bcl2=None):
     return merge(feat, c).dropna(subset=["del_status", "coo"]).reset_index(drop=True)
 
 
-def _channel_pvalues(frac, y, coo):
+FIT_FAILURES = []   # (where, channel) of any logistic fit that failed; reported in results
+
+
+def _channel_pvalues(frac, y, coo, where="primary"):
     ps = []
     for i in range(frac.shape[1]):
         try:
             X = sm.add_constant(np.column_stack([frac[:, i], coo]))
             ps.append(float(sm.Logit(y, X).fit(disp=0).pvalues[1]))
         except Exception:
-            ps.append(1.0)
+            FIT_FAILURES.append((where, config.CHANNELS[i]))
+            ps.append(1.0)   # counted as not significant; logged in FIT_FAILURES
     return np.array(ps)
 
 
@@ -249,8 +253,10 @@ def double_expressor(feat, clin, seed=config.SEED):
     y = d["del_status"].astype(int).values
     coo = d["coo"].astype(float).values
     frac = _composition(d)
+    n_fail_before = len(FIT_FAILURES)
     p = _channel_pvalues(frac, y, coo)
     q = multipletests(p, method="fdr_bh")[1]
+    n_failed = len(FIT_FAILURES) - n_fail_before
     delta = frac[y == 1].mean(0) - frac[y == 0].mean(0)
     table = pd.DataFrame({"channel": config.CHANNELS, "delta_x100": delta * 100, "p": p, "q_fdr": q})
     table["group"] = table["channel"].map(
@@ -273,6 +279,9 @@ def double_expressor(feat, clin, seed=config.SEED):
         "global_signal_non_del": round(float(raw_total[y == 0].mean()), 3),
         "global_signal_p": float(f"{sps.mannwhitneyu(raw_total[y == 1], raw_total[y == 0]).pvalue:.3g}"),
         "classifier_auc_oof": round(float(roc_auc_score(y, oof)), 3),
+        "classifier_features": f"all {X.shape[1]} raw feature columns",
+        "classifier_auc_oof_composition_only": round(float(roc_auc_score(y, _oof_logit(frac, y, seed))), 3),
+        "n_failed_logistic_fits": int(n_failed),
     }
     return table.sort_values("delta_x100").reset_index(drop=True), summary
 
@@ -513,3 +522,208 @@ def _n_sig_nocov(frac, y):
         except Exception:
             ps.append(1.0)
     return int((multipletests(ps, method="fdr_bh")[1] < config.FDR_ALPHA).sum())
+
+
+
+def _oof_logit(X, y, seed):
+    oof = np.zeros(len(y))
+    for tr, te in StratifiedKFold(config.CV_FOLDS, shuffle=True, random_state=seed).split(X, y):
+        mdl = make_pipeline(StandardScaler(), LogisticRegression(C=0.5, max_iter=5000))
+        mdl.fit(X[tr], y[tr])
+        oof[te] = mdl.predict_proba(X[te])[:, 1]
+    return oof
+
+
+# ---------------------------------------------------------------- additions after second audit
+def _firth_fit(X, y, fixed=None, maxit=200, tol=1e-9):
+    """Firth-penalized logistic regression (Heinze & Schemper 2002).
+
+    `fixed` = index of a coefficient held at 0; the penalty always uses the FULL design's
+    information matrix, so the penalized likelihood-ratio test compares like with like.
+    Returns (beta, penalized log-likelihood, covariance of the free parameters' fit).
+    """
+    from scipy.special import expit
+    free = np.array([j for j in range(X.shape[1]) if j != fixed])
+    b = np.zeros(X.shape[1])
+
+    def pll(beta):
+        pr = np.clip(expit(X @ beta), 1e-12, 1 - 1e-12)
+        info = X.T @ (X * (pr * (1 - pr))[:, None])
+        return float(np.sum(y * np.log(pr) + (1 - y) * np.log(1 - pr)) + 0.5 * np.linalg.slogdet(info)[1])
+
+    cur = pll(b)
+    for _ in range(maxit):
+        pr = expit(X @ b)
+        w = pr * (1 - pr)
+        info = X.T @ (X * w[:, None])
+        inv = np.linalg.inv(info)
+        h = np.einsum("ij,jk,ik->i", X * np.sqrt(w)[:, None], inv, X * np.sqrt(w)[:, None])
+        score = X.T @ (y - pr + h * (0.5 - pr))
+        step = np.zeros_like(b)
+        step[free] = np.linalg.solve(info[np.ix_(free, free)], score[free])
+        t = 1.0
+        while t > 1e-8:
+            new = pll(b + t * step)
+            if new >= cur - 1e-12:
+                break
+            t /= 2
+        b, prev, cur = b + t * step, cur, new
+        if abs(cur - prev) < tol and np.max(np.abs(t * step)) < 1e-7:
+            break
+    pr = expit(X @ b)
+    cov = np.linalg.inv(X.T @ (X * (pr * (1 - pr))[:, None]))
+    return b, cur, cov
+
+
+def firth_double_expressor(feat, clin):
+    """Small-sample sensitivity: Firth logistic (penalized likelihood-ratio p) for each channel share,
+    adjusted for Hans COO; odds ratios per SD with Wald 95 % CIs from the penalized fit."""
+    d = _del_frame(feat, clin)
+    y = d["del_status"].astype(float).values
+    coo = d["coo"].astype(float).values
+    raw = d[mean_columns()].values
+    frac = raw / raw.sum(1, keepdims=True)
+    rows = []
+    for i, c in enumerate(config.CHANNELS):
+        z = (frac[:, i] - frac[:, i].mean()) / frac[:, i].std()
+        Xf = np.column_stack([np.ones(len(y)), z, coo])
+        bf, lf, cov = _firth_fit(Xf, y)
+        _, lr, _ = _firth_fit(Xf, y, fixed=1)
+        p = float(sps.chi2.sf(2 * (lf - lr), 1))
+        se = float(np.sqrt(cov[1, 1]))
+        rows.append({"channel": c, "or_per_sd": float(np.exp(bf[1])),
+                     "ci_low": float(np.exp(bf[1] - 1.96 * se)), "ci_high": float(np.exp(bf[1] + 1.96 * se)), "p": p})
+    t = pd.DataFrame(rows)
+    t["q_fdr"] = multipletests(t["p"], method="fdr_bh")[1]
+    sig = t[t["q_fdr"] < config.FDR_ALPHA]
+    key = t.set_index("channel").loc[["CK", "CD3", "CD20", "CD138", "DAPI", "Ki67"]]
+    return t, {
+        "n_significant_firth": int(len(sig)),
+        "significant_channels_firth": sig["channel"].tolist(),
+        "or_per_sd_key": {k: [round(r.or_per_sd, 2), round(r.ci_low, 2), round(r.ci_high, 2)] for k, r in key.iterrows()},
+        "n_gcb_double_expressors": int(((y == 1) & (coo == 1)).sum()),
+    }
+
+
+def cohort_selection(feat, clin):
+    """Patients with vs without usable image features; IPI reconstruction check."""
+    c = clin.copy()
+    inc = c["case_id"].isin(set(feat["case_id"]))
+
+    def mw(col):
+        a, b = c.loc[inc, col].dropna(), c.loc[~inc, col].dropna()
+        return float(f"{sps.mannwhitneyu(a, b).pvalue:.3g}")
+
+    en = c["EN"] if "EN" in c.columns else pd.Series(np.nan, index=c.index)
+    recon = ((c["age"] > 60).astype(float) + (c["stage"] >= 3) + (c["ldh"] == 1) + (c["ecog"] >= 2) + (en >= 2))
+    complete = c[["age", "stage", "ldh", "ecog", "ipi_score"]].notna().all(1) & en.notna()
+    return {
+        "included": int(inc.sum()), "excluded": int((~inc).sum()),
+        "ipi_mean_included": round(float(c.loc[inc, "ipi_score"].mean()), 2),
+        "ipi_mean_excluded": round(float(c.loc[~inc, "ipi_score"].mean()), 2),
+        "ipi_mannwhitney_p": mw("ipi_score"),
+        "age_median_included": float(c.loc[inc, "age"].median()), "age_median_excluded": float(c.loc[~inc, "age"].median()),
+        "deaths_pct_included": round(float(c.loc[inc, "event"].mean() * 100), 1),
+        "deaths_pct_excluded": round(float(c.loc[~inc, "event"].mean() * 100), 1),
+        "ipi_reconstruction_complete_records": int(complete.sum()),
+        "ipi_reconstruction_mismatches": int((complete & (recon != c["ipi_score"])).sum()),
+    }
+
+
+def follow_up_and_ph(feat, clin):
+    """Follow-up (reverse Kaplan-Meier), KM median OS, and proportional-hazards checks."""
+    from lifelines import KaplanMeierFitter
+    from lifelines.statistics import proportional_hazard_test
+    m = _survival_frame(feat, clin)
+    rev = KaplanMeierFitter().fit(m["os"], 1 - m["event"])
+    km = KaplanMeierFitter().fit(m["os"], m["event"])
+    cl = m.dropna(subset=config.CLINICAL_COVARIATES)
+    cph = CoxPHFitter().fit(cl[config.CLINICAL_COVARIATES + ["os", "event"]], "os", "event")
+    ph = proportional_hazard_test(cph, cl[config.CLINICAL_COVARIATES + ["os", "event"]], time_transform="rank")
+    return {
+        "median_follow_up_reverse_km_years": round(float(rev.median_survival_time_), 1),
+        "km_median_os_years": round(float(km.median_survival_time_), 1),
+        "median_observed_time_years": round(float(m["os"].median()), 1),
+        "ph_test_p": {k: float(f"{v:.3g}") for k, v in zip(config.CLINICAL_COVARIATES, ph.p_value)},
+        "os_time_origin": "end of treatment (Vrabac et al., 2021)",
+    }
+
+
+def matched_survival_comparison(feat, clin, seeds=config.SIGNATURE_SEEDS, n_boot=1000, seed=config.SEED,
+                                bootstrap=True):
+    """IPI, clinical, clinical + extranodal, GigaTIME and clinical + GigaTIME, all on the SAME
+    patients and the SAME outer folds. The combined model is built entirely inside each outer
+    training fold: the GigaTIME score for training patients comes from an inner 5-fold
+    cross-validation, the clinical + score Cox model is fitted on those, and it is applied to the
+    held-out fold with the GigaTIME model refitted on the whole training fold. Reports pooled
+    out-of-fold C-indices per split and the change in C (combined minus clinical) with a
+    patient-bootstrap 95 % CI of the out-of-fold predictions (does not include refitting variance).
+    """
+    m = _survival_frame(feat, clin)
+    if "EN" not in m.columns:
+        m["EN"] = np.nan
+    m["en"] = m["EN"]
+    clin_cols = config.CLINICAL_COVARIATES
+    clin_en = clin_cols + ["en"]
+    m = m.dropna(subset=clin_en + ["ipi_score"]).reset_index(drop=True)
+    gcols = feature_columns(feat)
+    rng = np.random.default_rng(seed)
+
+    def cox_fit_predict(train, test, cols, pen=0.01, l1=0.0):
+        mu, sd = train[cols].mean(), train[cols].std().replace(0, 1)
+        d = ((train[cols] - mu) / sd).copy()
+        d["os"], d["event"] = train["os"].values, train["event"].values
+        cph = CoxPHFitter(penalizer=pen, l1_ratio=l1).fit(d, "os", "event")
+        return cph.predict_log_partial_hazard((test[cols] - mu) / sd).values
+
+    per_seed, deltas, preds = {}, [], []
+    for s in seeds:
+        pred = {k: np.full(len(m), np.nan) for k in ["clinical", "clinical_en", "gigatime", "combined"]}
+        for tr, te in KFold(config.CV_FOLDS, shuffle=True, random_state=s).split(m):
+            train, test = m.iloc[tr].reset_index(drop=True), m.iloc[te]
+            pred["clinical"][te] = cox_fit_predict(train, test, clin_cols)
+            pred["clinical_en"][te] = cox_fit_predict(train, test, clin_en)
+            pred["gigatime"][te] = cox_fit_predict(train, test, gcols, config.COX_PENALIZER, config.COX_L1_RATIO)
+            train = train.copy()
+            train["gt"] = oof_cox_scores(train, gcols, s)          # inner CV, training fold only
+            test = test.copy()
+            test["gt"] = pred["gigatime"][te]
+            pred["combined"][te] = cox_fit_predict(train, test, clin_cols + ["gt"])
+        c = {k: _cindex(m["os"], v, m["event"]) for k, v in pred.items()}
+        c["ipi"] = _cindex(m["os"], m["ipi_score"], m["event"])
+        per_seed[int(s)] = {k: round(v, 3) for k, v in c.items()}
+        preds.append(pred)
+        deltas.append(c["combined"] - c["clinical"])
+    # patient bootstrap of the change in C, averaged over all splits (refitting variance not included)
+    boot = []
+    for _ in range(n_boot if bootstrap else 0):
+        i = rng.integers(0, len(m), len(m))
+        t, e = m["os"].iloc[i], m["event"].iloc[i]
+        boot.append(np.mean([_cindex(t, p["combined"][i], e) - _cindex(t, p["clinical"][i], e) for p in preds]))
+    ci = [round(float(np.percentile(boot, 2.5)), 3), round(float(np.percentile(boot, 97.5)), 3)] if boot else None
+    mean = {k: round(float(np.mean([v[k] for v in per_seed.values()])), 3) for k in per_seed[config.SEED]}
+    return {
+        "n": int(len(m)), "events": int(m["event"].sum()),
+        "cindex_mean_over_splits": mean,
+        "delta_c_combined_minus_clinical_range": [round(float(min(deltas)), 3), round(float(max(deltas)), 3)],
+        "delta_c_mean": round(float(np.mean(deltas)), 3),
+        "delta_c_bootstrap_95ci": ci,
+        "per_seed": per_seed,
+    }
+
+
+def added_value_null(feat, clin, n_perm=config.N_ADDED_VALUE_PERMUTATIONS, seed=config.SEED, seeds=config.SIGNATURE_SEEDS):
+    """Full-procedure null for the change in C: GigaTIME feature rows are shuffled across patients
+    (keeping the clinical-outcome relationships intact) and matched_survival_comparison is re-run."""
+    obs = matched_survival_comparison(feat, clin, seeds=seeds, bootstrap=False)["delta_c_mean"]
+    rng = np.random.default_rng(seed)
+    null = []
+    for _ in range(n_perm):
+        f = feat.copy()
+        cols = feature_columns(feat)
+        f[cols] = feat[cols].values[rng.permutation(len(feat))]
+        null.append(matched_survival_comparison(f, clin, seeds=seeds, bootstrap=False)["delta_c_mean"])
+    null = np.array(null)
+    return {"n_permutations": int(n_perm), "observed_delta_c_mean": obs,
+            "null_95_range": [round(float(np.percentile(null, 2.5)), 3), round(float(np.percentile(null, 97.5)), 3)],
+            "p_one_sided": round(float((np.sum(null >= obs) + 1) / (n_perm + 1)), 3), "_null": null.tolist()}

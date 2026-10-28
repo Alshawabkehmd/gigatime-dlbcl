@@ -68,6 +68,26 @@ def test_audit_analyses_run(synth):
     assert 0 <= sn["p_two_sided"] <= 1 and sn["detectable_hr_per_sd_80pct_power"] > 1
 
 
+def test_firth_matches_ml_without_separation():
+    """Firth estimates are close to (and shrunk toward 0 from) ordinary logistic estimates."""
+    import statsmodels.api as sm
+    rng = np.random.default_rng(1)
+    x = rng.normal(size=400)
+    y = (rng.random(400) < 1 / (1 + np.exp(-(0.3 + 0.8 * x)))).astype(float)
+    X = np.column_stack([np.ones(400), x])
+    b, _, _ = stats._firth_fit(X, y)
+    ml = sm.Logit(y, X).fit(disp=0).params
+    assert abs(b[1] - ml[1]) < 0.05 and abs(b[1]) <= abs(ml[1]) + 1e-9
+
+
+def test_selection_and_follow_up_run(synth):
+    clin, feat = synth
+    fu = stats.follow_up_and_ph(feat, clin)
+    assert fu["median_follow_up_reverse_km_years"] > 0 and set(fu["ph_test_p"]) == set(config.CLINICAL_COVARIATES)
+    cs = stats.cohort_selection(feat, clin)
+    assert cs["included"] + cs["excluded"] == len(clin)
+
+
 def test_stratified_permutation_keeps_strata():
     rng = np.random.default_rng(0)
     y = np.array([1, 0, 0, 1, 0, 1, 0, 0])
@@ -114,9 +134,16 @@ def test_reproduces_published_values():
         "double_expressor": stats.double_expressor(feat, clin)[1],
         "double_expressor_cohort": stats.double_expressor_cohort(feat, clin),
         "double_expressor_axis": stats.double_expressor_axis(feat, clin, n_perm=50),
+        "double_expressor_firth": stats.firth_double_expressor(feat, clin)[1],
+        "km": stats.km_tests(feat, clin)[0],
+        "added_value": stats.added_value(feat, clin),
+        "follow_up": stats.follow_up_and_ph(feat, clin),
+        "cohort_selection": stats.cohort_selection(feat, clin),
+        "matched_survival": stats.matched_survival_comparison(feat, clin, n_boot=200),
     }
     # values that depend on the number of permutations are checked in the notebook only
-    skip = {"double_expressor_axis.pc1_stratified_permutation_p"}
+    skip = {"double_expressor_axis.pc1_stratified_permutation_p",
+            "matched_survival.delta_c_bootstrap_95ci"}
     for key, spec in exp.items():
         top = key.split(".")[0]
         if top not in res or key in skip:

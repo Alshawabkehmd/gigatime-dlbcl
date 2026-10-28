@@ -4,9 +4,12 @@ Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0):
 https://creativecommons.org/licenses/by-nc/4.0/legalcode
 
 clinical_data_cleaned.csv is redistributed unmodified from DLBCL-Morph:
-  Vrabac D, et al. H&E and immunohistochemical stain images of 209 cases of
-  diffuse large B-cell lymphoma (DLBCL-Morphology). The Cancer Imaging Archive.
+  Fernandez-Pol S, Natkunam Y, Vrabac D, Rojansky R, Advani R, Rajpurkar P, et al.
+  H&E and immunohistochemical stain images of 209 cases of diffuse large B-cell
+  lymphoma linked with cytogenetic features and clinical outcomes (Version 1)
+  [Data set]. The Cancer Imaging Archive; 2022.
   https://doi.org/10.7937/NVA3-N783  (licensed CC BY-NC 4.0)
+  Associated paper: Vrabac D, et al. Scientific Data 2021;8:135.
 
 gigatime_case_features*.csv are derived from the DLBCL-Morph H&E images using
 GigaTIME (https://github.com/prov-gigatime/GigaTIME) by Almoutasm Bllah
