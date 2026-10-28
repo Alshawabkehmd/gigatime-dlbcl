@@ -96,30 +96,39 @@
       0.175
     ],
     "gigatime_hr_all_below_1": true,
+    "gigatime_hr_per_sd_range": [
+      0.61,
+      0.82
+    ],
     "per_seed": {
       "0": {
         "lrt_p": 0.175,
         "gigatime_hr": 0.2,
+        "gigatime_hr_per_sd": 0.82,
         "cindex_apparent": 0.713
       },
       "7": {
         "lrt_p": 0.046,
         "gigatime_hr": 0.2,
+        "gigatime_hr_per_sd": 0.72,
         "cindex_apparent": 0.722
       },
       "17": {
         "lrt_p": 0.003,
         "gigatime_hr": 0.09,
+        "gigatime_hr_per_sd": 0.61,
         "cindex_apparent": 0.731
       },
       "42": {
         "lrt_p": 0.114,
         "gigatime_hr": 0.22,
+        "gigatime_hr_per_sd": 0.76,
         "cindex_apparent": 0.721
       },
       "123": {
         "lrt_p": 0.061,
         "gigatime_hr": 0.18,
+        "gigatime_hr_per_sd": 0.79,
         "cindex_apparent": 0.733
       }
     }
@@ -129,6 +138,20 @@
     "gigatime_split_logrank_p": 0.113,
     "gigatime_high_risk_death_rate": 0.28,
     "gigatime_low_risk_death_rate": 0.4
+  },
+  "survival_null": {
+    "n_permutations": 300,
+    "observed_cindex_pooled": 0.422,
+    "observed_cindex_per_fold_mean": 0.431,
+    "null_median": 0.491,
+    "null_95_range": [
+      0.387,
+      0.585
+    ],
+    "null_fraction_below_0_5": 0.55,
+    "p_two_sided": 0.15,
+    "events": 58,
+    "detectable_hr_per_sd_80pct_power": 1.44
   },
   "double_expressor": {
     "n": 160,
@@ -154,32 +177,67 @@
     "global_signal_p": 0.00071,
     "classifier_auc_oof": 0.614
   },
+  "double_expressor_cohort": {
+    "double_expressor": {
+      "n": 21,
+      "age_median_iqr": [
+        64.0,
+        57.0,
+        70.0
+      ],
+      "stage_3_4_pct": 47.6,
+      "ipi_3_5_pct": 33.3,
+      "ldh_elevated_pct": 28.6,
+      "non_gcb_pct": 76.2,
+      "deaths_pct": 47.6,
+      "km_median_os_years": 10.9
+    },
+    "other": {
+      "n": 139,
+      "age_median_iqr": [
+        63.0,
+        52.5,
+        71.5
+      ],
+      "stage_3_4_pct": 49.6,
+      "ipi_3_5_pct": 28.8,
+      "ldh_elevated_pct": 34.1,
+      "non_gcb_pct": 54.0,
+      "deaths_pct": 30.9,
+      "km_median_os_years": null
+    },
+    "non_gcb_fisher_p": 0.062,
+    "double_hit_or_triple_hit_n": 6,
+    "double_hit_among_double_expressors": 3
+  },
   "double_expressor_robustness": {
     "observed_significant": 12,
     "permutation_n": 1000,
+    "permutation_scheme": "labels shuffled within Hans cell-of-origin strata",
+    "permutation_null_max": 10,
     "permutation_null_median": 0.0,
     "permutation_null_95th": 0.0,
     "permutation_p": 0.001,
     "bootstrap_ci_x100": {
       "CD3": [
-        -3.1,
-        -1.74,
-        -0.41
+        -3.05,
+        -1.73,
+        -0.35
       ],
       "CD4": [
-        -3.41,
-        -2.0,
-        -0.57
+        -3.34,
+        -2.01,
+        -0.54
       ],
       "PD-L1": [
-        -1.75,
+        -1.76,
         -1.06,
-        -0.32
+        -0.33
       ],
       "CD68": [
-        -1.13,
-        -0.67,
-        -0.17
+        -1.12,
+        -0.66,
+        -0.18
       ],
       "T-bet": [
         -0.72,
@@ -189,22 +247,22 @@
       "Ki67": [
         0.03,
         0.21,
-        0.38
+        0.39
       ],
       "CD138": [
-        0.61,
-        2.03,
-        3.26
+        0.66,
+        2.02,
+        3.27
       ],
       "Caspase3-D": [
-        1.18,
+        1.14,
         2.48,
-        3.86
+        3.9
       ],
       "DAPI": [
-        1.13,
-        2.29,
-        3.45
+        1.11,
+        2.28,
+        3.43
       ]
     },
     "leave_one_out_min": 12,
@@ -214,32 +272,101 @@
         "myc": 30,
         "bcl2": 50,
         "n_del": 31,
+        "same_patients_as_primary": false,
         "n_significant": 15
       },
       {
         "myc": 40,
         "bcl2": 40,
         "n_del": 21,
+        "same_patients_as_primary": true,
         "n_significant": 12
       },
       {
         "myc": 40,
         "bcl2": 50,
         "n_del": 21,
+        "same_patients_as_primary": true,
         "n_significant": 12
       },
       {
         "myc": 40,
         "bcl2": 60,
         "n_del": 21,
+        "same_patients_as_primary": true,
         "n_significant": 12
       },
       {
         "myc": 50,
         "bcl2": 50,
         "n_del": 20,
+        "same_patients_as_primary": false,
         "n_significant": 14
       }
     ]
+  },
+  "double_expressor_axis": {
+    "n_significant_share_bh": 12,
+    "n_significant_share_by": 11,
+    "n_significant_clr_bh": 12,
+    "pca_variance_explained_pc1_3": [
+      0.37,
+      0.33,
+      0.13
+    ],
+    "pc1_top_loadings": [
+      "Ki67",
+      "Caspase3-D",
+      "CD11c",
+      "CD138",
+      "CD4",
+      "CK"
+    ],
+    "pc1_coo_adjusted_p": 0.000338,
+    "pc1_stratified_permutation_p": 0.001,
+    "pc2_p": 0.0318,
+    "pc3_p": 0.033,
+    "n_significant_after_adjusting_each_channel": {
+      "DAPI": 0,
+      "PD-1": 14,
+      "CD14": 12,
+      "CD4": 4,
+      "T-bet": 6,
+      "CD34": 15,
+      "CD68": 10,
+      "CD16": 13,
+      "CD11c": 1,
+      "CD138": 0,
+      "CD20": 11,
+      "CD3": 7,
+      "CD8": 14,
+      "PD-L1": 9,
+      "CK": 0,
+      "Ki67": 7,
+      "Tryptase": 12,
+      "Actin-D": 12,
+      "Caspase3-D": 0,
+      "PHH3-B": 14,
+      "Transgelin": 16
+    },
+    "channels_whose_adjustment_removes_signal": [
+      "DAPI",
+      "CD138",
+      "CK",
+      "Caspase3-D"
+    ],
+    "n_significant_adjusted_for_ck": 0,
+    "ck_raw_mean_del": 0.287,
+    "ck_raw_mean_other": 0.171,
+    "ck_raw_p": 0.00686,
+    "ck_raw_vs_myc_spearman": 0.3,
+    "pc1_vs_myc_continuous_p": 6.61e-08,
+    "pc1_vs_bcl2_continuous_p": 0.0329,
+    "non_gcb_only_n": [
+      16,
+      75
+    ],
+    "non_gcb_only_n_significant": 13,
+    "excluding_double_hit_n_significant": 13
   }
 }

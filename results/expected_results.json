@@ -1,25 +1,133 @@
 {
-  "description": "Key results from the real DLBCL-Morph run (MODE='features'). Notebook Section 9.1 and `pytest -m real` compare a re-run against these. Tolerances allow for small numerical differences across package versions.",
+  "description": "Key results from the real DLBCL-Morph run (MODE='features'). Notebook Section 9.1 and `pytest -m real` compare a re-run against these. Tolerances allow for small numerical differences across package versions. Checks under survival_null are skipped unless N_SURVIVAL_PERMUTATIONS = 300.",
   "checks": {
-    "cohort_flow.with_gigatime_features": {"value": 170, "tolerance": 0},
-    "cohort_flow.events_in_feature_cohort": {"value": 58, "tolerance": 0},
-    "cohort_flow.double_expressor_cohort": {"value": 160, "tolerance": 0},
-    "cohort_flow.double_expressor_positive": {"value": 21, "tolerance": 0},
-    "face_validity.cd20_mean": {"value": 0.533, "tolerance": 0.002},
-    "face_validity.ck_mean": {"value": 0.183, "tolerance": 0.002},
-    "face_validity.cd20_rank_of_21": {"value": 4, "tolerance": 0},
-    "coexpression.within_t_cell_r": {"value": 0.69, "tolerance": 0.01},
-    "coexpression.within_myeloid_r": {"value": 0.81, "tolerance": 0.01},
-    "coexpression.cd20_ck_r": {"value": -0.65, "tolerance": 0.01},
-    "coo_classification.auc_oof": {"value": 0.557, "tolerance": 0.01},
-    "univariable_cox.n_fdr_significant": {"value": 0, "tolerance": 0},
-    "gigatime_signature.cindex_mean": {"value": 0.43, "tolerance": 0.01},
-    "clinical_and_ipi.ipi_cindex": {"value": 0.649, "tolerance": 0.002},
-    "clinical_and_ipi.clinical_cindex_oof": {"value": 0.663, "tolerance": 0.01},
-    "double_expressor.n_fdr_significant_coo_adjusted": {"value": 12, "tolerance": 0},
-    "double_expressor.classifier_auc_oof": {"value": 0.614, "tolerance": 0.01},
-    "double_expressor_robustness.permutation_p": {"value": 0.001, "tolerance": 0.001},
-    "double_expressor_robustness.leave_one_out_min": {"value": 12, "tolerance": 0},
-    "double_expressor_robustness.leave_one_out_max": {"value": 15, "tolerance": 0}
+    "cohort_flow.with_gigatime_features": {
+      "value": 170,
+      "tolerance": 0
+    },
+    "cohort_flow.events_in_feature_cohort": {
+      "value": 58,
+      "tolerance": 0
+    },
+    "cohort_flow.double_expressor_cohort": {
+      "value": 160,
+      "tolerance": 0
+    },
+    "cohort_flow.double_expressor_positive": {
+      "value": 21,
+      "tolerance": 0
+    },
+    "face_validity.cd20_mean": {
+      "value": 0.533,
+      "tolerance": 0.002
+    },
+    "face_validity.ck_mean": {
+      "value": 0.183,
+      "tolerance": 0.002
+    },
+    "face_validity.cd20_rank_of_21": {
+      "value": 4,
+      "tolerance": 0
+    },
+    "coexpression.within_t_cell_r": {
+      "value": 0.69,
+      "tolerance": 0.01
+    },
+    "coexpression.within_myeloid_r": {
+      "value": 0.81,
+      "tolerance": 0.01
+    },
+    "coexpression.cd20_ck_r": {
+      "value": -0.65,
+      "tolerance": 0.01
+    },
+    "coo_classification.auc_oof": {
+      "value": 0.557,
+      "tolerance": 0.01
+    },
+    "univariable_cox.n_fdr_significant": {
+      "value": 0,
+      "tolerance": 0
+    },
+    "gigatime_signature.cindex_mean": {
+      "value": 0.43,
+      "tolerance": 0.01
+    },
+    "clinical_and_ipi.ipi_cindex": {
+      "value": 0.649,
+      "tolerance": 0.002
+    },
+    "clinical_and_ipi.clinical_cindex_oof": {
+      "value": 0.663,
+      "tolerance": 0.01
+    },
+    "double_expressor.n_fdr_significant_coo_adjusted": {
+      "value": 12,
+      "tolerance": 0
+    },
+    "double_expressor.classifier_auc_oof": {
+      "value": 0.614,
+      "tolerance": 0.01
+    },
+    "double_expressor_robustness.permutation_p": {
+      "value": 0.001,
+      "tolerance": 0.001
+    },
+    "double_expressor_robustness.leave_one_out_min": {
+      "value": 12,
+      "tolerance": 0
+    },
+    "double_expressor_robustness.leave_one_out_max": {
+      "value": 15,
+      "tolerance": 0
+    },
+    "survival_null.observed_cindex_pooled": {
+      "value": 0.422,
+      "tolerance": 0.01
+    },
+    "survival_null.p_two_sided": {
+      "value": 0.15,
+      "tolerance": 0.05
+    },
+    "added_value.gigatime_hr_all_below_1": {
+      "value": 1,
+      "tolerance": 0
+    },
+    "double_expressor_cohort.double_expressor.non_gcb_pct": {
+      "value": 76.2,
+      "tolerance": 0.1
+    },
+    "double_expressor_cohort.other.non_gcb_pct": {
+      "value": 54.0,
+      "tolerance": 0.1
+    },
+    "double_expressor_robustness.permutation_null_max": {
+      "value": 10,
+      "tolerance": 0
+    },
+    "double_expressor_axis.n_significant_clr_bh": {
+      "value": 12,
+      "tolerance": 0
+    },
+    "double_expressor_axis.pc1_coo_adjusted_p": {
+      "value": 0.000338,
+      "tolerance": 0.0001
+    },
+    "double_expressor_axis.n_significant_adjusted_for_ck": {
+      "value": 0,
+      "tolerance": 0
+    },
+    "double_expressor_axis.pc1_vs_myc_continuous_p": {
+      "value": 6.61e-08,
+      "tolerance": 1e-08
+    },
+    "double_expressor_axis.non_gcb_only_n_significant": {
+      "value": 13,
+      "tolerance": 0
+    },
+    "double_expressor_axis.excluding_double_hit_n_significant": {
+      "value": 13,
+      "tolerance": 0
+    }
   }
 }
